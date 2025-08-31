@@ -1,36 +1,192 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Authentication Demo - Simple Login & Register Frontend
 
-## Getting Started
+A clean, modern Next.js frontend application demonstrating simple authentication functionality with login and registration.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Authentication Features
+
+- **Beautiful Landing Page** - Simple design with authentication options
+- **User Login** - Secure login with JWT tokens
+- **User Registration** - Account creation with form validation
+- **User Dashboard** - Simple welcome screen showing user information
+- **Token Management** - Automatic token handling and validation
+- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+
+## 🛠️ Technology Stack
+
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Axios** - HTTP client for API communication
+- **Lucide React** - Beautiful icon library
+- **React Context** - State management for authentication
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── auth/              # Authentication pages
+│   │   ├── login/         # Login page
+│   │   │   └── page.tsx
+│   │   └── register/      # Registration page
+│   │       └── page.tsx
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Landing/Home page
+├── components/            # Reusable components
+│   └── ui/               # UI components
+│       ├── Button.tsx
+│       ├── Input.tsx
+│       ├── Card.tsx
+│       └── Modal.tsx
+├── contexts/             # React contexts
+│   └── AuthContext.tsx   # Authentication context
+├── lib/                  # Utilities and configurations
+│   ├── api.ts           # Authentication API service
+│   └── utils.ts         # Utility functions
+└── types/               # TypeScript type definitions
+    └── index.ts         # Authentication types
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 UI Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Core Components
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Button** - Styled button with variants (primary, secondary, outline, ghost, danger)
+- **Input** - Form input with label, error states, and validation
+- **Card** - Container component with header, title, and content sections
+- **Modal** - Overlay modal for forms and confirmations
 
-## Learn More
+## 🔐 Authentication Flow
 
-To learn more about Next.js, take a look at the following resources:
+1. **Landing Page** - Choose between login or registration
+2. **Registration** - Create new account with name, email, phone, and password
+3. **Login** - Sign in with email and password
+4. **Authenticated State** - Welcome screen with user information and logout option
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 Responsive Design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The application is fully responsive with:
 
-## Deploy on Vercel
+- Mobile-first approach
+- Breakpoint-optimized layouts
+- Touch-friendly interactions
+- Accessible navigation patterns
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎯 Key Pages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Landing Page (`/`)
+
+- Authentication selection interface
+- Login and registration cards
+- User welcome screen when authenticated
+- Responsive design
+
+### Login (`/auth/login`)
+
+- Modern login form with validation
+- Error handling and loading states
+- Password visibility toggle
+- Redirect to home after successful auth
+
+### Registration (`/auth/register`)
+
+- Account creation form
+- Form validation with error messages
+- Password requirements
+- Automatic login after registration
+
+## 🔧 Setup and Installation
+
+1. **Install Dependencies**
+
+   ```bash
+   npm install
+   ```
+
+2. **Environment Configuration**
+   Create `.env.local`:
+
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:3001
+   ```
+
+3. **Start Development Server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Access the Application**
+   - Frontend: http://localhost:3000
+   - Ensure backend is running on http://localhost:3001
+
+## 🚀 Deployment
+
+1. **Build for Production**
+
+   ```bash
+   npm run build
+   ```
+
+2. **Start Production Server**
+   ```bash
+   npm start
+   ```
+
+## 📝 API Integration
+
+The frontend integrates with the NestJS backend for:
+
+- User registration (`POST /auth/register`)
+- User login (`POST /auth/login`)
+- Profile retrieval (`GET /auth/profile`)
+- Token refresh (`POST /auth/refresh`)
+
+## 🎨 Design System
+
+### Colors
+
+- Primary: Blue (#3B82F6)
+- Success: Green (#10B981)
+- Warning: Yellow (#F59E0B)
+- Danger: Red (#EF4444)
+- Gray scale for text and backgrounds
+
+### Typography
+
+- Geist Sans for UI text
+- Responsive font sizes
+- Proper heading hierarchy
+
+### Spacing
+
+- Consistent spacing scale
+- Responsive padding and margins
+- Grid-based layouts
+
+## 🔍 Authentication Features
+
+### Form Validation
+
+- Real-time email validation
+- Password strength requirements
+- Phone number validation
+- Error message display
+
+### Security
+
+- JWT token storage in localStorage
+- Automatic token validation
+- Secure API communication
+- Token refresh handling
+
+### User Experience
+
+- Loading states during authentication
+- Success and error feedback
+- Smooth transitions between states
+- Responsive form design
+
+This simplified frontend provides a clean, professional authentication system that can be easily integrated with any backend API.
