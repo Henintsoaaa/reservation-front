@@ -33,9 +33,11 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("fr-MG", {
       style: "currency",
-      currency: "USD",
+      currency: "MGA",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -80,10 +82,10 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
             {reservations.map((reservation) => (
               <tr key={reservation.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {reservation.user?.name || reservation.userId}
+                  {reservation.user?.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {reservation.venue?.name || reservation.venueId}
+                  {reservation.venue?.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatDateTime(reservation.startTime)}
@@ -112,17 +114,6 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                         className="text-green-600 hover:text-green-900"
                       >
                         Confirm
-                      </button>
-                      <button
-                        onClick={() =>
-                          onUpdateStatus(
-                            reservation.id,
-                            ReservationStatus.CANCELLED
-                          )
-                        }
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Cancel
                       </button>
                     </>
                   )}

@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(user?.role === "admin");
 
   const handleLogout = () => {
     logout();
@@ -41,19 +42,20 @@ const Navbar: React.FC = () => {
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
-                  >
-                    <Icon className="w-4 h-4 mr-2" />
-                    {item.name}
-                  </Link>
-                );
-              })}
+              {!isAdmin &&
+                navigation.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
             </div>
           </div>
 
