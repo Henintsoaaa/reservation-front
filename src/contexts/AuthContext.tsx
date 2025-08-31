@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { User, AuthResponse, LoginDto, RegisterDto } from "@/types";
 import { authApi } from "@/lib/api";
 import {
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const isAuthenticated = !!user && !!getToken();
 
@@ -59,6 +61,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(response.access_token);
       setUser(response.user);
       setStoredUser(response.user);
+
+      // Redirect admin users to admin dashboard
+      if (response.user.role === "admin") {
+        router.push("/admin");
+      }
     } catch (error) {
       throw error;
     }
@@ -72,6 +79,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(response.access_token);
       setUser(response.user);
       setStoredUser(response.user);
+
+      // Redirect admin users to admin dashboard
+      if (response.user.role === "admin") {
+        router.push("/admin");
+      }
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
@@ -81,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     removeToken();
     setUser(null);
+    router.push("/");
   };
 
   const refreshUser = async () => {

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   AuthForm,
@@ -11,6 +12,7 @@ import {
 
 export default function Home() {
   const { isAuthenticated, user, logout, login, register } = useAuth();
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,13 @@ export default function Home() {
     password: "",
     phone: "",
   });
+
+  // Redirect admin users to admin dashboard after authentication
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "admin") {
+      router.push("/admin");
+    }
+  }, [isAuthenticated, user, router]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
@@ -45,6 +54,7 @@ export default function Home() {
 
     try {
       await login(loginForm);
+      // Note: The redirect will happen automatically via useEffect
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid credentials");
     } finally {
@@ -59,6 +69,7 @@ export default function Home() {
 
     try {
       await register(registerForm);
+      // Note: The redirect will happen automatically via useEffect if user is admin
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -66,7 +77,7 @@ export default function Home() {
     }
   };
 
-  if (isAuthenticated) {
+  if (isAuthenticated && user?.role !== "admin") {
     return <UserDashboard user={user} onLogout={logout} />;
   }
 

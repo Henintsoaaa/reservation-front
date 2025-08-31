@@ -23,3 +23,39 @@ export interface RegisterDto {
   phone: string;
   role?: string;
 }
+
+export enum ReservationStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+}
+
+export interface Location {
+  address: string;
+  city: string;
+}
+
+export interface Venue {
+  id: string;
+  name: string;
+  description: string;
+  location: Location;
+  capacity: number;
+  pricePerHour: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Reservation {
+  id: string;
+  userId: string;
+  venueId: string;
+  startTime: string;
+  endTime: string;
+  status: ReservationStatus;
+  totalPrice: number;
+  createdAt: string;
+  updatedAt: string;
+  user?: User;
+  venue?: Venue;
+}
