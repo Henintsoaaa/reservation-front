@@ -22,9 +22,6 @@ const TestLogin: React.FC = () => {
         }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
-
       if (response.ok) {
         const data = await response.json();
         setResult(`Success: ${JSON.stringify(data, null, 2)}`);
@@ -33,7 +30,6 @@ const TestLogin: React.FC = () => {
         setResult(`Error ${response.status}: ${errorData}`);
       }
     } catch (error: any) {
-      console.error("Fetch error:", error);
       setResult(`Fetch error: ${error.message}`);
     } finally {
       setLoading(false);
@@ -62,7 +58,6 @@ const TestLogin: React.FC = () => {
 
       setResult(`Axios Success: ${JSON.stringify(response.data, null, 2)}`);
     } catch (error: any) {
-      console.error("Axios error:", error);
       setResult(
         `Axios error: ${error.message}\nResponse: ${JSON.stringify(
           error.response?.data,

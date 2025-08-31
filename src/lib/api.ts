@@ -16,11 +16,10 @@ const api = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  withCredentials: false, // Set to false since we're using JWT tokens
-  timeout: 10000, // 10 second timeout
+  withCredentials: false,
+  timeout: 10000,
 });
 
-// Request interceptor to add auth token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) {
@@ -29,17 +28,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Response Error:", error);
-
     if (error.response?.status === 401) {
-      console.log("401 Unauthorized - clearing tokens and redirecting");
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
-      // Only redirect if we're not already on the login page
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.includes("/auth")
@@ -54,57 +48,18 @@ api.interceptors.response.use(
 export const authApi = {
   login: async (credentials: LoginDto): Promise<AuthResponse> => {
     try {
-      console.log("API: Making login request to", `${API_BASE_URL}/auth/login`);
-      console.log("API: Login credentials:", {
-        email: credentials.email,
-        password: "[HIDDEN]",
-      });
-
       const response = await api.post("/auth/login", credentials);
-      console.log("API: Login response received:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("API: Login error:", error);
-      console.error("API: Error response:", error.response?.data);
-      console.error("API: Error status:", error.response?.status);
-      console.error("API: Full error details:", {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-        config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers,
-        },
-      });
       throw error;
     }
   },
 
   register: async (userData: RegisterDto): Promise<AuthResponse> => {
     try {
-      console.log(
-        "API: Making register request to",
-        `${API_BASE_URL}/auth/register`,
-        "with data:",
-        userData
-      );
       const response = await api.post("/auth/register", userData);
-      console.log("API: Register response:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("API: Register error:", error);
-      console.error("API: Error response:", error.response?.data);
-      console.error("API: Error status:", error.response?.status);
-      console.error("API: Full error details:", {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      });
       throw error;
     }
   },

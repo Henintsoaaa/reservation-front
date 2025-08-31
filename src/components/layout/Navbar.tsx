@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo and primary navigation */}
+          
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="text-2xl font-bold text-blue-600">
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* User menu */}
+          
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
             {isAuthenticated ? (
               <>
@@ -85,7 +85,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          
           <div className="sm:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -101,7 +101,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      
       {isMobileMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">

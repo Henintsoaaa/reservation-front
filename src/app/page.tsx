@@ -30,10 +30,11 @@ export default function Home() {
     phone: "",
   });
 
-  // Redirect admin users to admin dashboard after authentication
   useEffect(() => {
     if (isAuthenticated && user?.role === "admin") {
       router.push("/admin");
+    } else if (isAuthenticated && user?.role !== "admin") {
+      router.push("/dashboard");
     }
   }, [isAuthenticated, user, router]);
 
@@ -54,7 +55,6 @@ export default function Home() {
 
     try {
       await login(loginForm);
-      // Note: The redirect will happen automatically via useEffect
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid credentials");
     } finally {
@@ -69,7 +69,6 @@ export default function Home() {
 
     try {
       await register(registerForm);
-      // Note: The redirect will happen automatically via useEffect if user is admin
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -77,21 +76,25 @@ export default function Home() {
     }
   };
 
-  if (isAuthenticated && user?.role !== "admin") {
-    return <UserDashboard user={user} onLogout={logout} />;
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Redirecting to your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
-      {/* Background decorations */}
       <BackgroundDecorations />
 
       <div className="relative flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
-          {/* Left side - Branding */}
           <WelcomeSection />
 
-          {/* Right side - Authentication Forms */}
           <AuthForm
             isLogin={isLogin}
             showPassword={showPassword}

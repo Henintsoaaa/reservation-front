@@ -39,12 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token && storedUser) {
         setUser(storedUser);
         try {
-          // Verify token is still valid by fetching profile
           const profile = await authApi.getProfile();
           setUser(profile);
           setStoredUser(profile);
         } catch (error) {
-          // Token is invalid, clear storage
           removeToken();
           setUser(null);
         }
@@ -62,7 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.user);
       setStoredUser(response.user);
 
-      // Redirect admin users to admin dashboard
       if (response.user.role === "admin") {
         router.push("/admin");
       }
@@ -73,19 +70,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (userData: RegisterDto) => {
     try {
-      console.log("Starting registration with data:", userData);
       const response: AuthResponse = await authApi.register(userData);
-      console.log("Registration successful:", response);
       setToken(response.access_token);
       setUser(response.user);
       setStoredUser(response.user);
 
-      // Redirect admin users to admin dashboard
       if (response.user.role === "admin") {
         router.push("/admin");
       }
     } catch (error) {
-      console.error("Registration error:", error);
       throw error;
     }
   };

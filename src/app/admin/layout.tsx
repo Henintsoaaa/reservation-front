@@ -17,10 +17,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        // User is not authenticated, redirect to login
         router.push("/");
       } else if (user.role !== "admin") {
-        // User is authenticated but not admin, redirect to home
         router.push("/");
       }
     }
