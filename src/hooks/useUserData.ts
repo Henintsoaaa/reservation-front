@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { reservationsApi, venuesApi } from "@/lib/api";
-import { Reservation, Venue, ReservationStatus } from "@/types";
+import { reservationsApi } from "@/lib/api";
+import { Reservation, ReservationStatus } from "@/types";
 
 export const useUserData = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +15,7 @@ export const useUserData = () => {
 
       const [reservationsData, venuesData] = await Promise.all([
         reservationsApi.getMyReservations(),
-        venuesApi.getAll(),
+        Promise.resolve([]), // Venues no longer exist
       ]);
 
       setReservations(reservationsData);

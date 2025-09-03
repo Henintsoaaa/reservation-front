@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { X, Calendar, Clock, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { reservationsApi, venuesApi } from "@/lib/api";
-import { Reservation, Venue } from "@/types";
+import { reservationsApi } from "@/lib/api";
+import { Reservation, Event } from "@/types";
 
 interface EditReservationModalProps {
   reservation: Reservation;
@@ -19,11 +19,11 @@ const EditReservationModal: React.FC<EditReservationModalProps> = ({
   onUpdated,
 }) => {
   const [formData, setFormData] = useState({
-    venueId: reservation.venueId,
+    venueId: (reservation as any).venueId || "",
     startTime: new Date(reservation.startTime).toISOString().slice(0, 16),
     endTime: new Date(reservation.endTime).toISOString().slice(0, 16),
   });
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [availability, setAvailability] = useState<boolean | null>(null);
@@ -41,8 +41,8 @@ const EditReservationModal: React.FC<EditReservationModalProps> = ({
 
   const fetchVenues = async () => {
     try {
-      const data = await venuesApi.getAll();
-      setVenues(data);
+      // Venues are no longer separate entities
+      setVenues([]);
     } catch (err: any) {
       setError("Failed to fetch venues");
     }
@@ -62,7 +62,7 @@ const EditReservationModal: React.FC<EditReservationModalProps> = ({
       .slice(0, 16);
 
     if (
-      formData.venueId === reservation.venueId &&
+      formData.venueId === (reservation as any).venueId &&
       formData.startTime === originalStartTime &&
       formData.endTime === originalEndTime
     ) {
@@ -75,12 +75,8 @@ const EditReservationModal: React.FC<EditReservationModalProps> = ({
       const startTime = new Date(formData.startTime).toISOString();
       const endTime = new Date(formData.endTime).toISOString();
 
-      const result = await reservationsApi.checkAvailability(
-        formData.venueId,
-        startTime,
-        endTime
-      );
-      setAvailability(result.available);
+      // Availability checking is no longer supported
+      setAvailability(false);
     } catch (err: any) {
       setError("Failed to check availability");
       setAvailability(false);

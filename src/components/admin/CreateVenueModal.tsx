@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { venuesApi } from "@/lib/api";
-import { Venue } from "@/types";
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { reservationsApi } from "@/lib/api";
+import type { Event } from "@/types";
 
 interface CreateVenueModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onVenueCreated: (venue: Venue) => void;
+  onVenueCreated: () => void;
 }
 
 const CreateVenueModal: React.FC<CreateVenueModalProps> = ({
@@ -31,21 +35,18 @@ const CreateVenueModal: React.FC<CreateVenueModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
-      const venue = await venuesApi.create(formData);
-      onVenueCreated(venue);
-      setFormData({
-        name: "",
-        description: "",
-        location: { address: "", city: "" },
-        capacity: 0,
-        pricePerHour: 0,
-      });
+      // Venue creation is no longer supported as venues are embedded in events
+      console.log("Venue creation attempt:", formData);
+      alert(
+        "Venue creation is no longer supported. Venues are now embedded in events."
+      );
+      onVenueCreated();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create venue");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create venue");
     } finally {
       setLoading(false);
     }

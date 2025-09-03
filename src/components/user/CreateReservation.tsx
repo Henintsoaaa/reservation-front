@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, Users, DollarSign, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { reservationsApi, venuesApi } from "@/lib/api";
-import { Venue } from "@/types";
+import { reservationsApi } from "@/lib/api";
+import { Event } from "@/types";
 
 interface CreateReservationProps {
   onReservationCreated: () => void;
@@ -23,7 +23,7 @@ const CreateReservation: React.FC<CreateReservationProps> = ({
     startTime: "",
     endTime: "",
   });
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingVenues, setLoadingVenues] = useState(true);
   const [error, setError] = useState("");
@@ -50,13 +50,11 @@ const CreateReservation: React.FC<CreateReservationProps> = ({
 
   const fetchVenues = async () => {
     try {
-      setLoadingVenues(true);
-      const data = await venuesApi.getAll();
-      setVenues(data);
-    } catch (err: any) {
-      setError("Failed to fetch venues");
-    } finally {
-      setLoadingVenues(false);
+      // Venues are no longer separate entities, they are embedded in events
+      console.log("Venue fetching is no longer supported");
+      setVenues([]);
+    } catch (error) {
+      console.error("Error fetching venues:", error);
     }
   };
 
@@ -71,11 +69,7 @@ const CreateReservation: React.FC<CreateReservationProps> = ({
       const startTime = new Date(formData.startTime).toISOString();
       const endTime = new Date(formData.endTime).toISOString();
 
-      const result = await reservationsApi.checkAvailability(
-        formData.venueId,
-        startTime,
-        endTime
-      );
+      const result = { available: false }; // No longer check availability as venues are embedded in events
       setAvailability(result.available);
     } catch (err: any) {
       setError("Failed to check availability");

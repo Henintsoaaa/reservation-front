@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { reservationsApi, venuesApi } from "@/lib/api";
-import { Reservation, Venue, ReservationStatus } from "@/types";
+import { reservationsApi } from "@/lib/api";
+import { Reservation, ReservationStatus } from "@/types";
 
 export const useAdminData = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ export const useAdminData = () => {
       setError(null);
       const [reservationsData, venuesData] = await Promise.all([
         reservationsApi.getAll(),
-        venuesApi.getAll(),
+        Promise.resolve([]), // Venues no longer exist
       ]);
       setReservations(reservationsData);
       setVenues(venuesData);
@@ -51,21 +51,20 @@ export const useAdminData = () => {
   };
 
   const deleteVenue = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this venue?")) return;
-
     try {
-      await venuesApi.delete(id);
-      await fetchData();
-    } catch (err: any) {
-      setError(err.message || "Failed to delete venue");
+      // Venue deletion is no longer supported
+      console.log("Venue deletion is no longer supported");
+      setVenues((prev) => prev.filter((venue) => venue.id !== id));
+    } catch (err) {
+      setError("Failed to delete venue");
     }
   };
 
-  const addVenue = (newVenue: Venue) => {
+  const addVenue = (newVenue: any) => {
     setVenues((prev) => [...prev, newVenue]);
   };
 
-  const updateVenue = (updatedVenue: Venue) => {
+  const updateVenue = (updatedVenue: any) => {
     setVenues((prev) =>
       prev.map((venue) => (venue.id === updatedVenue.id ? updatedVenue : venue))
     );

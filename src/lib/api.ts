@@ -5,7 +5,12 @@ import {
   RegisterDto,
   User,
   Reservation,
-  Venue,
+  Event,
+  Booking,
+  Review,
+  EventFilter,
+  PaginationParams,
+  PaginatedResponse,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -75,6 +80,138 @@ export const authApi = {
   },
 };
 
+export const eventsApi = {
+  getAll: async (
+    params?: EventFilter & PaginationParams
+  ): Promise<PaginatedResponse<Event>> => {
+    const response = await api.get("/events", { params });
+    return response.data;
+  },
+
+  getFeatured: async (): Promise<Event[]> => {
+    const response = await api.get("/events?featured=true");
+    return response.data;
+  },
+
+  getAvailable: async (): Promise<Event[]> => {
+    const response = await api.get("/events/available");
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Event> => {
+    const response = await api.get(`/events/${id}`);
+    return response.data;
+  },
+
+  getByCategory: async (category: string): Promise<Event[]> => {
+    const response = await api.get(`/events?category=${category}`);
+    return response.data;
+  },
+
+  searchEvents: async (
+    query: string,
+    filters?: EventFilter
+  ): Promise<Event[]> => {
+    const response = await api.get("/events", {
+      params: { search: query, ...filters },
+    });
+    return response.data;
+  },
+
+  getNearby: async (
+    lat: number,
+    lng: number,
+    radius?: number
+  ): Promise<Event[]> => {
+    const response = await api.get("/events/nearby", {
+      params: { lat, lng, radius: radius || 50 },
+    });
+    return response.data;
+  },
+
+  create: async (eventData: any): Promise<Event> => {
+    const response = await api.post("/events", eventData);
+    return response.data;
+  },
+
+  update: async (id: string, eventData: any): Promise<Event> => {
+    const response = await api.patch(`/events/${id}`, eventData);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/events/${id}`);
+  },
+};
+
+export const bookingsApi = {
+  getAll: async (): Promise<Booking[]> => {
+    const response = await api.get("/bookings");
+    return response.data;
+  },
+
+  getMyBookings: async (): Promise<Booking[]> => {
+    const response = await api.get("/bookings/my-bookings");
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Booking> => {
+    const response = await api.get(`/bookings/${id}`);
+    return response.data;
+  },
+
+  create: async (bookingData: any): Promise<Booking> => {
+    const response = await api.post("/bookings", bookingData);
+    return response.data;
+  },
+
+  update: async (id: string, bookingData: any): Promise<Booking> => {
+    const response = await api.patch(`/bookings/${id}`, bookingData);
+    return response.data;
+  },
+
+  cancel: async (id: string): Promise<Booking> => {
+    const response = await api.delete(`/bookings/${id}`);
+    return response.data;
+  },
+
+  getEventStats: async (eventId: string): Promise<any> => {
+    const response = await api.get(`/bookings/stats/${eventId}`);
+    return response.data;
+  },
+
+  getAvailableSeats: async (eventId: string): Promise<any> => {
+    const response = await api.get(`/bookings/available-seats/${eventId}`);
+    return response.data;
+  },
+};
+
+export const reviewsApi = {
+  getByEvent: async (eventId: string): Promise<Review[]> => {
+    const response = await api.get(`/reviews/event/${eventId}`);
+    return response.data;
+  },
+
+  getByUser: async (userId: string): Promise<Review[]> => {
+    const response = await api.get(`/reviews/user/${userId}`);
+    return response.data;
+  },
+
+  create: async (reviewData: any): Promise<Review> => {
+    const response = await api.post("/reviews", reviewData);
+    return response.data;
+  },
+
+  update: async (id: string, reviewData: any): Promise<Review> => {
+    const response = await api.patch(`/reviews/${id}`, reviewData);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/reviews/${id}`);
+  },
+};
+
 export const reservationsApi = {
   getAll: async (): Promise<Reservation[]> => {
     const response = await api.get("/reservations");
@@ -108,66 +245,6 @@ export const reservationsApi = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/reservations/${id}`);
-  },
-
-  checkAvailability: async (
-    venueId: string,
-    startTime: string,
-    endTime: string
-  ): Promise<any> => {
-    const response = await api.get(
-      `/reservations/check-availability/${venueId}`,
-      {
-        params: { startTime, endTime },
-      }
-    );
-    return response.data;
-  },
-
-  getVenueAvailability: async (venueId: string, date: string): Promise<any> => {
-    const response = await api.get(
-      `/reservations/venue-availability/${venueId}`,
-      {
-        params: { date },
-      }
-    );
-    return response.data;
-  },
-};
-
-export const venuesApi = {
-  getAll: async (): Promise<Venue[]> => {
-    const response = await api.get("/venues");
-    return response.data;
-  },
-
-  getById: async (id: string): Promise<Venue> => {
-    const response = await api.get(`/venues/${id}`);
-    return response.data;
-  },
-
-  getAvailable: async (
-    startTime: string,
-    endTime: string
-  ): Promise<Venue[]> => {
-    const response = await api.get("/venues/available", {
-      params: { startTime, endTime },
-    });
-    return response.data;
-  },
-
-  create: async (venueData: any): Promise<Venue> => {
-    const response = await api.post("/venues", venueData);
-    return response.data;
-  },
-
-  update: async (id: string, venueData: any): Promise<Venue> => {
-    const response = await api.put(`/venues/${id}`, venueData);
-    return response.data;
-  },
-
-  delete: async (id: string): Promise<void> => {
-    await api.delete(`/venues/${id}`);
   },
 };
 

@@ -1,14 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { venuesApi } from "@/lib/api";
-import { Venue } from "@/types";
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { reservationsApi } from "@/lib/api";
+import type { Event } from "@/types";
 
 interface EditVenueModalProps {
   isOpen: boolean;
+  venue: any | null;
   onClose: () => void;
-  onVenueUpdated: (venue: Venue) => void;
-  venue: Venue | null;
+  onVenueUpdated: () => void;
 }
 
 const EditVenueModal: React.FC<EditVenueModalProps> = ({
@@ -17,7 +21,7 @@ const EditVenueModal: React.FC<EditVenueModalProps> = ({
   onVenueUpdated,
   venue,
 }) => {
-  const [formData, setFormData] = useState<Venue | null>(null);
+  const [formData, setFormData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,23 +33,21 @@ const EditVenueModal: React.FC<EditVenueModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData || !formData.id) return;
+    if (!formData) return;
 
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
-      const updatedVenue = await venuesApi.update(formData.id, {
-        name: formData.name,
-        description: formData.description,
-        location: formData.location,
-        capacity: formData.capacity,
-        pricePerHour: formData.pricePerHour,
-      });
-      onVenueUpdated(updatedVenue);
+      // Venue editing is no longer supported as venues are embedded in events
+      console.log("Venue edit attempt:", formData);
+      alert(
+        "Venue editing is no longer supported. Venues are now embedded in events."
+      );
+      onVenueUpdated();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update venue");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update venue");
     } finally {
       setLoading(false);
     }
@@ -58,7 +60,7 @@ const EditVenueModal: React.FC<EditVenueModalProps> = ({
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
       if (parent === "location") {
-        setFormData((prev) => {
+        setFormData((prev: any) => {
           if (!prev) return prev;
           return {
             ...prev,
@@ -70,7 +72,7 @@ const EditVenueModal: React.FC<EditVenueModalProps> = ({
         });
       }
     } else {
-      setFormData((prev) => {
+      setFormData((prev: any) => {
         if (!prev) return prev;
         return {
           ...prev,

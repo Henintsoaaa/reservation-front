@@ -15,9 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import MyReservations from "./MyReservations";
 import CreateReservation from "./CreateReservation";
-import AvailableVenues from "./AvailableVenues";
 
-type TabType = "reservations" | "create" | "venues" | "profile";
+type TabType = "reservations" | "create" | "profile";
 
 interface UserDashboardLayoutProps {
   user: any;
@@ -48,18 +47,13 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
       icon: Plus,
     },
     {
-      id: "venues" as TabType,
-      label: "Available Venues",
-      icon: MapPin,
-    },
-    {
       id: "profile" as TabType,
       label: "Profile",
       icon: User,
     },
   ];
 
-  const renderContent = () => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case "reservations":
         return <MyReservations />;
@@ -67,51 +61,10 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
         return (
           <CreateReservation
             onReservationCreated={() => setActiveTab("reservations")}
-            preselectedVenue={selectedVenue}
-            onVenueChange={() => setSelectedVenue(null)}
           />
         );
-      case "venues":
-        return <AvailableVenues onVenueSelect={handleVenueSelect} />;
       case "profile":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Profile Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Name
-                  </label>
-                  <p className="text-lg font-semibold">{user?.name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Email
-                  </label>
-                  <p className="text-lg">{user?.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Phone
-                  </label>
-                  <p className="text-lg">{user?.phone || "Not provided"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Role
-                  </label>
-                  <p className="text-lg capitalize">{user?.role}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
+        return <div>Profile settings (not implemented)</div>;
       default:
         return <MyReservations />;
     }
@@ -119,7 +72,6 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -149,7 +101,6 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          
           <div className="lg:w-64">
             <Card>
               <CardContent className="p-4">
@@ -176,8 +127,7 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
             </Card>
           </div>
 
-          
-          <div className="flex-1">{renderContent()}</div>
+          <div className="flex-1">{renderTabContent()}</div>
         </div>
       </div>
     </div>
