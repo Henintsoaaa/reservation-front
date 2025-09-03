@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Calendar,
   MapPin,
@@ -11,18 +11,65 @@ import {
   Clock,
 } from "lucide-react";
 import { Event } from "@/types";
+import { eventsApi } from "@/lib/api";
 
 interface FeaturedEventsProps {
-  events: Event[];
-  isLoading: boolean;
+  events?: Event[];
+  isLoading?: boolean;
   onEventSelect?: (event: Event) => void;
 }
 
 export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({
-  events,
-  isLoading,
+  events: propEvents,
+  isLoading: propIsLoading,
   onEventSelect,
 }) => {
+  const [events, setEvents] = useState<Event[]>(propEvents || []);
+  const [isLoading, setIsLoading] = useState(propIsLoading ?? false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!propEvents || propEvents.length === 0) {
+      loadFeaturedEvents();
+    } else {
+      setEvents(propEvents);
+      setIsLoading(propIsLoading ?? false);
+    }
+  }, [propEvents, propIsLoading]);
+
+  const loadFeaturedEvents = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Charger les événements en vedette
+      const response = await eventsApi.getAll({ page: 1, limit: 6 });
+
+      // Adapter les données pour le frontend
+      const adaptedEvents = response.data.map((event: any) => ({
+        ...event,
+        startDateTime: event.date,
+        endDateTime: event.date,
+        basePrice: event.ticketPrice,
+        maxPrice: event.ticketPrice,
+        images: event.imageUrl ? [event.imageUrl] : [],
+        isFeatured: true,
+        rating: 4.8, // Valeur par défaut
+        reviewCount: Math.floor(Math.random() * 200) + 50,
+      }));
+
+      setEvents(adaptedEvents);
+    } catch (error: any) {
+      console.error(
+        "Erreur lors du chargement des événements en vedette:",
+        error
+      );
+      setError("Impossible de charger les événements");
+      setEvents([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,6 +86,20 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({
             </div>
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-red-500 text-lg mb-4">{error}</div>
+        <button
+          onClick={loadFeaturedEvents}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Réessayer
+        </button>
       </div>
     );
   }
@@ -95,15 +156,12 @@ const FeaturedEventCard: React.FC<{
           alt={event.title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-
-        {/* Badge Featured */}
         <div className="absolute top-3 left-3">
           <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
             ⭐ Vedette
           </span>
         </div>
 
-        {/* Action Buttons */}
         <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => {
@@ -136,7 +194,6 @@ const FeaturedEventCard: React.FC<{
           </button>
         </div>
 
-        {/* Date Badge */}
         <div className="absolute bottom-3 left-3">
           <div className="bg-white rounded-lg shadow-lg p-2 text-center min-w-[60px]">
             <div className="text-lg font-bold text-gray-900">
@@ -148,7 +205,6 @@ const FeaturedEventCard: React.FC<{
           </div>
         </div>
 
-        {/* Availability Badge */}
         {event.availableSeats < 10 && event.availableSeats > 0 && (
           <div className="absolute bottom-3 right-3">
             <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
@@ -195,13 +251,6 @@ const FeaturedEventCard: React.FC<{
               <span className="text-green-600 font-medium ml-1">• À venir</span>
             )}
           </div>
-          {/*           
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-red-500" />
-            <span className="line-clamp-1">
-              {event.venue?.city}, {event.venue?.address}
-            </span>
-          </div> */}
 
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-green-500" />
@@ -211,7 +260,6 @@ const FeaturedEventCard: React.FC<{
           </div>
         </div>
 
-        {/* Category and Rating */}
         <div className="flex items-center justify-between">
           <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium capitalize">
             {event.category}
@@ -224,7 +272,6 @@ const FeaturedEventCard: React.FC<{
           </div>
         </div>
 
-        {/* Progress Bar for Availability */}
         <div className="mt-3">
           <div className="flex justify-between text-xs text-gray-500 mb-1">
             <span>Disponibilité</span>

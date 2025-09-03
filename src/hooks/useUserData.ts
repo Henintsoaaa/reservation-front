@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { reservationsApi } from "@/lib/api";
-import { Reservation, ReservationStatus } from "@/types";
+import { bookingsApi, usersApi, eventsApi } from "@/lib/api";
+import { Booking } from "@/types";
 
 export const useUserData = () => {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [venues, setVenues] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userEvents, setUserEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,13 +14,23 @@ export const useUserData = () => {
       setLoading(true);
       setError(null);
 
-      const [reservationsData, venuesData] = await Promise.all([
-        reservationsApi.getMyReservations(),
-        Promise.resolve([]), // Venues no longer exist
+      const [bookingsData, profile] = await Promise.all([
+        bookingsApi.getMyBookings(),
+        usersApi.getMe(),
       ]);
 
-      setReservations(reservationsData);
-      setVenues(venuesData);
+      setBookings(bookingsData);
+      setUserProfile(profile);
+
+      // Charger les événements liés aux bookings
+      if (bookingsData.length > 0) {
+        const eventIds = [
+          ...new Set(bookingsData.map((booking) => booking.eventId)),
+        ];
+        const eventsPromises = eventIds.map((id) => eventsApi.getById(id));
+        const eventsData = await Promise.all(eventsPromises);
+        setUserEvents(eventsData);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to fetch data");
     } finally {
@@ -27,73 +38,77 @@ export const useUserData = () => {
     }
   };
 
-  const createReservation = async (reservationData: any) => {
+  const createBooking = async (bookingData: any) => {
     try {
-      const newReservation = await reservationsApi.create(reservationData);
-      setReservations((prev) => [newReservation, ...prev]);
-      return newReservation;
+      const newBooking = await bookingsApi.create(bookingData);
+      setBookings((prev) => [newBooking, ...prev]);
+      return newBooking;
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.message || "Failed to create reservation"
+        err.response?.data?.message || "Failed to create booking"
       );
     }
   };
 
-  const updateReservation = async (id: string, updateData: any) => {
+  const updateBooking = async (id: string, updateData: any) => {
     try {
-      const updatedReservation = await reservationsApi.update(id, updateData);
-      setReservations((prev) =>
-        prev.map((reservation) =>
-          reservation.id === id ? updatedReservation : reservation
-        )
+      const updatedBooking = await bookingsApi.update(id, updateData);
+      setBookings((prev) =>
+        prev.map((booking) => (booking.id === id ? updatedBooking : booking))
       );
-      return updatedReservation;
+      return updatedBooking;
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.message || "Failed to update reservation"
+        err.response?.data?.message || "Failed to update booking"
       );
     }
   };
 
-  const cancelReservation = async (id: string) => {
+  const cancelBooking = async (id: string) => {
     try {
-      const updatedReservation = await reservationsApi.updateStatus(
-        id,
-        ReservationStatus.CANCELLED
+      const updatedBooking = await bookingsApi.cancel(id);
+      setBookings((prev) =>
+        prev.map((booking) => (booking.id === id ? updatedBooking : booking))
       );
-      setReservations((prev) =>
-        prev.map((reservation) =>
-          reservation.id === id ? updatedReservation : reservation
-        )
-      );
-      return updatedReservation;
+      return updatedBooking;
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.message || "Failed to cancel reservation"
+        err.response?.data?.message || "Failed to cancel booking"
       );
     }
   };
 
-  const deleteReservation = async (id: string) => {
+  const deleteBooking = async (id: string) => {
     try {
-      await reservationsApi.delete(id);
-      setReservations((prev) =>
-        prev.filter((reservation) => reservation.id !== id)
-      );
+      await bookingsApi.cancel(id);
+      setBookings((prev) => prev.filter((booking) => booking.id !== id));
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.message || "Failed to delete reservation"
+        err.response?.data?.message || "Failed to delete booking"
       );
     }
   };
 
-  const refreshReservations = async () => {
+  const refreshBookings = async () => {
     try {
-      const reservationsData = await reservationsApi.getMyReservations();
-      setReservations(reservationsData);
+      const bookingsData = await bookingsApi.getMyBookings();
+      setBookings(bookingsData);
     } catch (err: any) {
       throw new Error(
-        err.response?.data?.message || "Failed to refresh reservations"
+        err.response?.data?.message || "Failed to refresh bookings"
+      );
+    }
+  };
+
+  const updateProfile = async (updateData: any) => {
+    try {
+      if (!userProfile?.id) throw new Error("User profile not loaded");
+      const updatedProfile = await usersApi.update(userProfile.id, updateData);
+      setUserProfile(updatedProfile);
+      return updatedProfile;
+    } catch (err: any) {
+      throw new Error(
+        err.response?.data?.message || "Failed to update profile"
       );
     }
   };
@@ -103,15 +118,17 @@ export const useUserData = () => {
   }, []);
 
   return {
-    reservations,
-    venues,
+    bookings,
+    userProfile,
+    userEvents,
     loading,
     error,
     fetchData,
-    createReservation,
-    updateReservation,
-    cancelReservation,
-    deleteReservation,
-    refreshReservations,
+    createBooking,
+    updateBooking,
+    cancelBooking,
+    deleteBooking,
+    refreshBookings,
+    updateProfile,
   };
 };

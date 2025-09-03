@@ -14,9 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Authentication Demo - Simple Login & Register",
-  description:
-    "Simple authentication system with login and registration functionality",
+  title: "Reservation",
+  description: "Reservation des places",
 };
 
 export default function RootLayout({

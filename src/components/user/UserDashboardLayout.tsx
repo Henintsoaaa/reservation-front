@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import MyReservations from "./MyReservations";
-import CreateReservation from "./CreateReservation";
 
 type TabType = "reservations" | "create" | "profile";
 
@@ -52,23 +50,6 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
       icon: User,
     },
   ];
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "reservations":
-        return <MyReservations />;
-      case "create":
-        return (
-          <CreateReservation
-            onReservationCreated={() => setActiveTab("reservations")}
-          />
-        );
-      case "profile":
-        return <div>Profile settings (not implemented)</div>;
-      default:
-        return <MyReservations />;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -127,7 +108,7 @@ const UserDashboardLayout: React.FC<UserDashboardLayoutProps> = ({
             </Card>
           </div>
 
-          <div className="flex-1">{renderTabContent()}</div>
+          {/* <div className="flex-1">{renderTabContent()}</div> */}
         </div>
       </div>
     </div>

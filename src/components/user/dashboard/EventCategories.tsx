@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { EventCategory } from "@/types";
+import { eventsApi } from "@/lib/api";
 
 interface EventCategoriesProps {
   onCategorySelect: (category: EventCategory) => void;
@@ -10,6 +11,48 @@ interface EventCategoriesProps {
 export const EventCategories: React.FC<EventCategoriesProps> = ({
   onCategorySelect,
 }) => {
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>(
+    {}
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCategoryCounts();
+  }, []);
+
+  const loadCategoryCounts = async () => {
+    try {
+      setLoading(true);
+
+      // Charger les événements pour calculer les comptes par catégorie
+      const response = await eventsApi.getAll({ page: 1, limit: 1000 });
+      const events = response.data;
+
+      // Calculer les comptes par catégorie
+      const counts: Record<string, number> = {};
+      events.forEach((event: any) => {
+        const category = event.category;
+        counts[category] = (counts[category] || 0) + 1;
+      });
+
+      setCategoryCounts(counts);
+    } catch (error) {
+      console.error("Erreur lors du chargement des catégories:", error);
+      // Valeurs par défaut en cas d'erreur
+      setCategoryCounts({
+        concert: 25,
+        theater: 15,
+        sports: 18,
+        conference: 12,
+        exhibition: 8,
+        festival: 6,
+        workshop: 22,
+        other: 11,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const categories = [
     {
       id: EventCategory.CONCERT,
@@ -17,7 +60,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "🎵",
       description: "Musique live et spectacles",
       gradient: "from-purple-500 to-pink-500",
-      count: 25,
+      count: categoryCounts["concert"] || 0,
     },
     {
       id: EventCategory.THEATER,
@@ -25,7 +68,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "🎭",
       description: "Pièces et représentations",
       gradient: "from-red-500 to-orange-500",
-      count: 15,
+      count: categoryCounts["theater"] || 0,
     },
     {
       id: EventCategory.SPORTS,
@@ -33,7 +76,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "⚽",
       description: "Événements sportifs",
       gradient: "from-green-500 to-teal-500",
-      count: 18,
+      count: categoryCounts["sports"] || 0,
     },
     {
       id: EventCategory.CONFERENCE,
@@ -41,7 +84,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "💼",
       description: "Business et networking",
       gradient: "from-blue-500 to-indigo-500",
-      count: 12,
+      count: categoryCounts["conference"] || 0,
     },
     {
       id: EventCategory.EXHIBITION,
@@ -49,7 +92,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "🎨",
       description: "Art et culture",
       gradient: "from-yellow-500 to-orange-500",
-      count: 8,
+      count: categoryCounts["exhibition"] || 0,
     },
     {
       id: EventCategory.FESTIVAL,
@@ -57,7 +100,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "🎪",
       description: "Événements multi-jours",
       gradient: "from-pink-500 to-rose-500",
-      count: 6,
+      count: categoryCounts["festival"] || 0,
     },
     {
       id: EventCategory.WORKSHOP,
@@ -65,7 +108,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "🛠️",
       description: "Formation et apprentissage",
       gradient: "from-indigo-500 to-purple-500",
-      count: 22,
+      count: categoryCounts["workshop"] || 0,
     },
     {
       id: EventCategory.OTHER,
@@ -73,7 +116,7 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
       icon: "📝",
       description: "Événements divers",
       gradient: "from-gray-500 to-gray-600",
-      count: 11,
+      count: categoryCounts["other"] || 0,
     },
   ];
 
@@ -88,15 +131,31 @@ export const EventCategories: React.FC<EventCategoriesProps> = ({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-        {categories.map((category) => (
-          <CategoryCard
-            key={category.id}
-            category={category}
-            onClick={() => onCategorySelect(category.id)}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, index) => (
+            <div
+              key={index}
+              className="p-6 bg-white rounded-xl shadow-md animate-pulse"
+            >
+              <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded mb-3"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              onClick={() => onCategorySelect(category.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Popular Categories Section */}
       <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
@@ -150,12 +209,10 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
       onClick={onClick}
       className="group relative overflow-hidden rounded-xl p-6 bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
-      {/* Background Gradient */}
       <div
         className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
       />
 
-      {/* Content */}
       <div className="relative z-10 text-center">
         <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">
           {category.icon}
@@ -179,7 +236,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
         </div>
       </div>
 
-      {/* Hover Effect Border */}
       <div
         className={`absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:${category.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
       />

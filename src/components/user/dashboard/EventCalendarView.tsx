@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,18 +11,54 @@ import {
   Star,
 } from "lucide-react";
 import { Event } from "@/types";
+import { eventsApi } from "@/lib/api";
 
 interface EventCalendarViewProps {
-  events: Event[];
+  events?: Event[];
   onEventSelect?: (event: Event) => void;
 }
 
 export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
-  events,
+  events: propEvents,
   onEventSelect,
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [events, setEvents] = useState<Event[]>(propEvents || []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!propEvents || propEvents.length === 0) {
+      loadEvents();
+    } else {
+      setEvents(propEvents);
+    }
+  }, [propEvents]);
+
+  const loadEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await eventsApi.getAll();
+
+      const adaptedEvents = response.data.map((event: any) => ({
+        ...event,
+        startDateTime: event.date,
+        endDateTime: event.date,
+        basePrice: event.ticketPrice,
+        images: event.imageUrl ? [event.imageUrl] : [],
+      }));
+
+      setEvents(adaptedEvents);
+    } catch (error: any) {
+      console.error("Erreur lors du chargement des événements:", error);
+      setError("Impossible de charger les événements");
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const monthNames = [
     "Janvier",
@@ -41,7 +77,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
 
   const dayNames = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
-  // Group events by date
   const eventsByDate = useMemo(() => {
     const grouped: { [key: string]: Event[] } = {};
 
@@ -61,7 +96,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
     return grouped;
   }, [events]);
 
-  // Get calendar days for current month
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -121,7 +155,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Calendar Header */}
       <div className="bg-blue-600 text-white p-4">
         <div className="flex items-center justify-between">
           <button
@@ -145,9 +178,7 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
       </div>
 
       <div className="flex">
-        {/* Calendar Grid */}
         <div className="flex-1 p-4">
-          {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {dayNames.map((day) => (
               <div
@@ -159,7 +190,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
             ))}
           </div>
 
-          {/* Calendar Days */}
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((date, index) => {
               const eventsForDay = getEventsForDate(date);
@@ -189,12 +219,10 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
                     ${hasEvents ? "cursor-pointer" : ""}
                   `}
                 >
-                  {/* Date Number */}
                   <div className="text-sm font-medium mb-1">
                     {date.getDate()}
                   </div>
 
-                  {/* Event Indicators */}
                   {hasEvents && (
                     <div className="space-y-1">
                       {eventsForDay.slice(0, 2).map((event, eventIndex) => (
@@ -214,8 +242,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
                       )}
                     </div>
                   )}
-
-                  {/* Event Count Dot */}
                   {hasEvents && (
                     <div className="absolute top-1 right-1">
                       <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -227,7 +253,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
           </div>
         </div>
 
-        {/* Selected Date Events Panel */}
         {selectedDate && (
           <div className="w-80 border-l border-gray-200 bg-gray-50">
             <div className="p-4 border-b border-gray-200 bg-white">
@@ -266,7 +291,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
         )}
       </div>
 
-      {/* Quick Navigation */}
       <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <button
@@ -306,7 +330,6 @@ export const EventCalendarView: React.FC<EventCalendarViewProps> = ({
   );
 };
 
-// Component for event cards in the day panel
 const EventDayCard: React.FC<{
   event: Event;
   onSelect?: (event: Event) => void;

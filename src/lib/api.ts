@@ -4,7 +4,6 @@ import {
   LoginDto,
   RegisterDto,
   User,
-  Reservation,
   Event,
   Booking,
   Review,
@@ -187,13 +186,23 @@ export const bookingsApi = {
 };
 
 export const reviewsApi = {
+  getAll: async (): Promise<Review[]> => {
+    const response = await api.get("/reviews");
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Review> => {
+    const response = await api.get(`/reviews/${id}`);
+    return response.data;
+  },
+
   getByEvent: async (eventId: string): Promise<Review[]> => {
-    const response = await api.get(`/reviews/event/${eventId}`);
+    const response = await api.get(`/reviews?eventId=${eventId}`);
     return response.data;
   },
 
   getByUser: async (userId: string): Promise<Review[]> => {
-    const response = await api.get(`/reviews/user/${userId}`);
+    const response = await api.get(`/reviews?userId=${userId}`);
     return response.data;
   },
 
@@ -212,39 +221,34 @@ export const reviewsApi = {
   },
 };
 
-export const reservationsApi = {
-  getAll: async (): Promise<Reservation[]> => {
-    const response = await api.get("/reservations");
+export const usersApi = {
+  getAll: async (): Promise<User[]> => {
+    const response = await api.get("/users");
     return response.data;
   },
 
-  getMyReservations: async (): Promise<Reservation[]> => {
-    const response = await api.get("/reservations/my-reservations");
+  getMe: async (): Promise<User> => {
+    const response = await api.get("/users/me");
     return response.data;
   },
 
-  getById: async (id: string): Promise<Reservation> => {
-    const response = await api.get(`/reservations/${id}`);
+  getById: async (id: string): Promise<User> => {
+    const response = await api.get(`/users/${id}`);
     return response.data;
   },
 
-  create: async (reservationData: any): Promise<Reservation> => {
-    const response = await api.post("/reservations", reservationData);
+  create: async (userData: any): Promise<User> => {
+    const response = await api.post("/users", userData);
     return response.data;
   },
 
-  update: async (id: string, reservationData: any): Promise<Reservation> => {
-    const response = await api.put(`/reservations/${id}`, reservationData);
-    return response.data;
-  },
-
-  updateStatus: async (id: string, status: string): Promise<Reservation> => {
-    const response = await api.put(`/reservations/${id}/status`, { status });
+  update: async (id: string, userData: any): Promise<User> => {
+    const response = await api.put(`/users/${id}`, userData);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/reservations/${id}`);
+    await api.delete(`/users/${id}`);
   },
 };
 
