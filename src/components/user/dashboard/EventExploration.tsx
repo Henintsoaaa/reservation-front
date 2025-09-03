@@ -39,6 +39,7 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
     limit: 12,
   });
   const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadEvents();
@@ -47,11 +48,34 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
   const loadEvents = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await eventsApi.getAll({ ...filters, ...pagination });
-      setEvents(response.data);
-      setTotalPages(response.totalPages);
+
+      // Handle different possible response structures
+      if (response && typeof response === "object") {
+        if (Array.isArray(response)) {
+          // Direct array response
+          setEvents(response);
+          setTotalPages(1);
+        } else if (response.data && Array.isArray(response.data)) {
+          // Paginated response
+          setEvents(response.data);
+          setTotalPages(response.totalPages || 1);
+        } else {
+          // Unexpected response structure
+          console.warn("Unexpected API response structure:", response);
+          setEvents([]);
+          setTotalPages(1);
+        }
+      } else {
+        setEvents([]);
+        setTotalPages(1);
+      }
     } catch (error) {
       console.error("Error loading events:", error);
+      setError("Failed to load events. Please try again.");
+      setEvents([]);
+      setTotalPages(1);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +103,11 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
       return <LoadingSkeleton viewMode={viewMode} />;
     }
 
-    if (events.length === 0) {
+    if (error) {
+      return <ErrorState error={error} onRetry={loadEvents} />;
+    }
+
+    if (!events || events.length === 0) {
       return <EmptyState />;
     }
 
@@ -87,7 +115,7 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
       case "grid":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {events.map((event) => (
+            {(events || []).map((event) => (
               <EventCard
                 key={event.id}
                 event={event}
@@ -100,7 +128,7 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
       case "list":
         return (
           <div className="space-y-4">
-            {events.map((event) => (
+            {(events || []).map((event) => (
               <EventListItem
                 key={event.id}
                 event={event}
@@ -109,14 +137,18 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
             ))}
           </div>
         );
-
       case "calendar":
         return (
-          <EventCalendarView events={events} onEventSelect={onEventSelect} />
+          <EventCalendarView
+            events={events || []}
+            onEventSelect={onEventSelect}
+          />
         );
 
       case "map":
-        return <EventMapView events={events} onEventSelect={onEventSelect} />;
+        return (
+          <EventMapView events={events || []} onEventSelect={onEventSelect} />
+        );
 
       default:
         return null;
@@ -208,7 +240,7 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
             <div className="text-sm text-gray-600">
               {isLoading
                 ? "Chargement..."
-                : `${events.length} événement(s) trouvé(s)`}
+                : `${events?.length || 0} événement(s) trouvé(s)`}
             </div>
           </div>
 
@@ -262,6 +294,7 @@ export const EventExploration: React.FC<EventExplorationProps> = ({
 
         {/* Pagination */}
         {!isLoading &&
+          events &&
           events.length > 0 &&
           viewMode !== "calendar" &&
           viewMode !== "map" && (
@@ -353,6 +386,26 @@ const EmptyState: React.FC = () => (
     </p>
     <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
       Réinitialiser les filtres
+    </button>
+  </div>
+);
+
+// Error State Component
+const ErrorState: React.FC<{
+  error: string;
+  onRetry: () => void;
+}> = ({ error, onRetry }) => (
+  <div className="text-center py-16">
+    <div className="text-6xl mb-4">⚠️</div>
+    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      Erreur de chargement
+    </h3>
+    <p className="text-gray-600 mb-6">{error}</p>
+    <button
+      onClick={onRetry}
+      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+    >
+      Réessayer
     </button>
   </div>
 );

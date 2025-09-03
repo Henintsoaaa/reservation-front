@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Event } from "@/types";
+import { Calendar, Star, Users, Search } from "lucide-react";
 import { PromotionalBanners } from "./PromotionalBanners";
 import { HeroSection } from "./HeroSection";
 import { TrendingSection } from "./TrendingSection";
@@ -32,105 +33,143 @@ export const HomePage: React.FC<HomePageProps> = ({ onEventSelect }) => {
   } = useHomePage();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section with Search */}
-      <HeroSection
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filters={filters}
-        setFilters={setFilters}
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-        onSearch={handleSearch}
-        onFilterChange={handleFilterChange}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Modern Hero Section */}
+      <div className="relative overflow-hidden">
+        <HeroSection
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          filters={filters}
+          setFilters={setFilters}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+          onSearch={handleSearch}
+          onFilterChange={handleFilterChange}
+        />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* API Status and Debug Info */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* API Status */}
         {apiError && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            <strong>Erreur API:</strong> {apiError}
-            <button
-              onClick={refreshData}
-              className="ml-4 px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-            >
-              Réessayer
-            </button>
+          <div className="mb-8 p-6 glass border border-red-300/30 text-red-700 rounded-2xl animate-fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">!</span>
+              </div>
+              <div>
+                <strong>Connection Issue:</strong> {apiError}
+                <button
+                  onClick={refreshData}
+                  className="ml-4 px-4 py-2 bg-red-500 text-white rounded-xl text-sm hover:bg-red-600 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* API Statistics */}
-        <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            Statistiques
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center">
-              <p className="font-medium text-blue-700">Événements totaux</p>
-              <p className="text-2xl font-bold text-blue-900">
-                {allEvents.length}
-              </p>
+        {/* Modern Statistics Dashboard */}
+        <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="card-elevated p-6 text-center group hover-scale">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl mx-auto mb-4 flex items-center justify-center">
+              <Calendar className="h-6 w-6 text-white" />
             </div>
-            <div className="text-center">
-              <p className="font-medium text-green-700">
-                Événements en vedette
-              </p>
-              <p className="text-2xl font-bold text-green-900">
-                {featuredEvents.length}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="font-medium text-purple-700">
-                Événements disponibles
-              </p>
-              <p className="text-2xl font-bold text-purple-900">
-                {availableEvents.length}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="font-medium text-orange-700">
-                Résultats de recherche
-              </p>
-              <p className="text-2xl font-bold text-orange-900">
-                {searchResults.length}
-              </p>
-            </div>
+            <p className="text-sm font-medium text-gray-600 mb-1">
+              Total Events
+            </p>
+            <p className="text-3xl font-bold gradient-text">
+              {allEvents.length}
+            </p>
           </div>
-          <div className="mt-2 text-center"></div>
+
+          <div className="card-elevated p-6 text-center group hover-scale">
+            <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl mx-auto mb-4 flex items-center justify-center">
+              <Star className="h-6 w-6 text-white" />
+            </div>
+            <p className="text-sm font-medium text-gray-600 mb-1">Featured</p>
+            <p className="text-3xl font-bold gradient-text-accent">
+              {featuredEvents.length}
+            </p>
+          </div>
+
+          <div className="card-elevated p-6 text-center group hover-scale">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl mx-auto mb-4 flex items-center justify-center">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <p className="text-sm font-medium text-gray-600 mb-1">Available</p>
+            <p className="text-3xl font-bold gradient-text-secondary">
+              {availableEvents.length}
+            </p>
+          </div>
+
+          <div className="card-elevated p-6 text-center group hover-scale">
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl mx-auto mb-4 flex items-center justify-center">
+              <Search className="h-6 w-6 text-white" />
+            </div>
+            <p className="text-sm font-medium text-gray-600 mb-1">
+              Search Results
+            </p>
+            <p className="text-3xl font-bold gradient-text">
+              {searchResults.length}
+            </p>
+          </div>
         </div>
 
         {/* Promotional Banners */}
-        <PromotionalBanners />
+        <div className="mb-12">
+          <PromotionalBanners />
+        </div>
 
         {/* Search Results */}
         {searchResults.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Résultats de recherche ({searchResults.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.slice(0, 6).map((event) => (
+          <section className="mb-16 animate-fade-in">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  Search Results
+                </h2>
+                <p className="text-gray-600">
+                  Found {searchResults.length} events matching your criteria
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {searchResults.slice(0, 6).map((event, index) => (
                 <div
                   key={event.id}
-                  className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+                  className="card-elevated p-6 cursor-pointer group animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => onEventSelect?.(event)}
                 >
-                  <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">
+                  <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl mb-4 flex items-center justify-center">
+                    <Calendar className="h-8 w-8 text-white" />
+                  </div>
+
+                  <h3 className="font-bold text-xl mb-3 text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {event.title}
+                  </h3>
+
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {event.description}
                   </p>
-                  <p className="text-sm text-gray-500">
-                    {event.venue?.name || "Lieu non spécifié"}
-                  </p>
-                  <p className="text-lg font-bold text-blue-600 mt-2">
-                    {event.ticketPrice}€
-                  </p>
-                  <div className="flex justify-between items-center mt-3 text-sm">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-gray-500">
+                      {event.venue?.name || "Venue TBA"}
+                    </span>
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
                       {event.category}
                     </span>
-                    <span className="text-gray-500">
-                      {event.availableSeats} places disponibles
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold gradient-text">
+                      ${event.ticketPrice}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {event.availableSeats} seats left
                     </span>
                   </div>
                 </div>
@@ -140,34 +179,60 @@ export const HomePage: React.FC<HomePageProps> = ({ onEventSelect }) => {
         )}
 
         {/* Trending Events */}
-        <TrendingSection
-          events={featuredEvents.length > 0 ? featuredEvents : availableEvents}
-          onEventSelect={onEventSelect}
-        />
+        <div className="mb-16">
+          <TrendingSection
+            events={
+              featuredEvents.length > 0 ? featuredEvents : availableEvents
+            }
+            onEventSelect={onEventSelect}
+          />
+        </div>
 
         {/* All Available Events */}
         {availableEvents.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Tous les événements disponibles ({availableEvents.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {availableEvents.slice(0, 8).map((event) => (
+          <section className="mb-16">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  All Events
+                </h2>
+                <p className="text-gray-600">
+                  Discover all {availableEvents.length} available events
+                </p>
+              </div>
+              <button className="btn-gradient px-6 py-3 text-white font-medium rounded-xl hover-scale">
+                View All
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {availableEvents.slice(0, 8).map((event, index) => (
                 <div
                   key={event.id}
-                  className="bg-white p-3 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+                  className="card-elevated p-4 cursor-pointer hover-scale animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
                   onClick={() => onEventSelect?.(event)}
                 >
-                  <h4 className="font-semibold mb-1 text-sm">{event.title}</h4>
-                  <p className="text-xs text-gray-600 mb-1">
+                  <div className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-3 flex items-center justify-center">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+
+                  <h4 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
+                    {event.title}
+                  </h4>
+
+                  <p className="text-xs text-gray-600 mb-2">
                     {event.venue?.name}
                   </p>
-                  <p className="text-sm font-bold text-green-600">
-                    {event.ticketPrice} Ar
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {event.availableSeats} places
-                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold gradient-text">
+                      ${event.ticketPrice}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {event.availableSeats} left
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -175,11 +240,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onEventSelect }) => {
         )}
 
         {/* Quick Actions */}
-        <QuickActionsSection
-          filters={filters}
-          setFilters={setFilters}
-          onSearch={handleSearch}
-        />
+        <div className="mb-8">
+          <QuickActionsSection
+            filters={filters}
+            setFilters={setFilters}
+            onSearch={handleSearch}
+          />
+        </div>
       </div>
     </div>
   );

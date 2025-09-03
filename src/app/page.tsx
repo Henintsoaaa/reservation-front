@@ -78,21 +78,40 @@ export default function Home() {
 
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Redirecting to your dashboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center overflow-hidden">
+        <div className="glass text-white text-center p-8 rounded-3xl animate-fade-in">
+          <div className="loading-dots mx-auto mb-6">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <h2 className="text-2xl font-bold mb-2 gradient-text">
+            Welcome Back!
+          </h2>
+          <p className="text-slate-300">Redirecting to your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       <BackgroundDecorations />
 
+      {/* Floating Elements */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-xl animate-float"></div>
+      <div
+        className="absolute bottom-20 right-20 w-32 h-32 bg-purple-500/20 rounded-full blur-xl animate-float"
+        style={{ animationDelay: "2s" }}
+      ></div>
+      <div
+        className="absolute top-1/2 left-1/4 w-16 h-16 bg-pink-500/20 rounded-full blur-xl animate-float"
+        style={{ animationDelay: "4s" }}
+      ></div>
+
       <div className="relative flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center animate-fade-in">
           <WelcomeSection />
 
           <AuthForm
@@ -111,6 +130,9 @@ export default function Home() {
           />
         </div>
       </div>
+
+      {/* Bottom decoration */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/20 to-transparent"></div>
     </div>
   );
 }
